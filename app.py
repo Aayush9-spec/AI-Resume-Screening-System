@@ -5,34 +5,90 @@ from dotenv import load_dotenv
 from groq import Groq
 from PyPDF2 import PdfReader
 import json
+import sqlite3
+import hashlib
 
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def init_db():
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT)''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+def make_hashes(password):
+    return hashlib.sha256(str.encode(password)).hexdigest()
+
+def add_user(username, password):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO users (username, password) VALUES (?,?)', (username, password))
+    conn.commit()
+    conn.close()
+
+def login_user(username, password):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, password))
+    data = c.fetchall()
+    conn.close()
+    return data
 
 def check_password():
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
 
     if not st.session_state.logged_in:
-        st.markdown("<h1 style='text-align: center;'>🔐 AI Recruiter Login</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center;'>Please enter your credentials to access the ATS dashboard.</p>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center;'>🔐 AI Recruiter Portal</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;'>Please Log In or Sign Up to access the ATS dashboard.</p>", unsafe_allow_html=True)
         
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.write("")
             with st.container(border=True):
-                username = st.text_input("👤 Username")
-                password = st.text_input("🔑 Password", type="password")
+                tab1, tab2 = st.tabs(["Login", "Sign Up"])
                 
-                if st.button("Log In", use_container_width=True, type="primary"):
-                    if username == "admin" and password == "1234":
-                        st.session_state.logged_in = True
-                        st.rerun()
-                    else:
-                        st.error("Incorrect username or password")
+                with tab1:
+                    username = st.text_input("👤 Username", key="login_user")
+                    password = st.text_input("🔑 Password", type="password", key="login_pass")
+                    
+                    if st.button("Log In", use_container_width=True, type="primary"):
+                        if username and password:
+                            hashed_pswd = make_hashes(password)
+                            result = login_user(username, hashed_pswd)
+                            if result:
+                                st.session_state.logged_in = True
+                                st.session_state.current_user = username
+                                st.rerun()
+                            else:
+                                st.error("Incorrect username or password")
+                        else:
+                            st.warning("Please enter both username and password")
+                            
+                with tab2:
+                    new_user = st.text_input("👤 New Username", key="reg_user")
+                    new_password = st.text_input("🔑 New Password", type="password", key="reg_pass")
+                    
+                    if st.button("Sign Up", use_container_width=True):
+                        if new_user and new_password:
+                            conn = sqlite3.connect('users.db')
+                            c = conn.cursor()
+                            c.execute('SELECT * FROM users WHERE username = ?', (new_user,))
+                            if c.fetchone():
+                                st.warning("Username already exists! Please try logging in.")
+                            else:
+                                add_user(new_user, make_hashes(new_password))
+                                st.success("Account created successfully! You can now log in.")
+                            conn.close()
+                        else:
+                            st.warning("Please enter username and password")
         return False
     else:
-        st.sidebar.title("⚙️ Dashboard Settings")
+        st.sidebar.title(f"👤 Welcome, {st.session_state.get('current_user', 'User')}")
         if st.sidebar.button("Logout", use_container_width=True):
             st.session_state.logged_in = False
             st.rerun()
