@@ -1,0 +1,13 @@
+Name: Aman Verma
+
+Skills:
+- Python, MongoDB
+- OpenAI API
+- Automation using Zapier
+
+Projects:
+- Resume screening tool using AI
+- Email automation workflow
+
+Experience:
+- Freelance automation projects

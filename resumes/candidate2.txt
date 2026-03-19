@@ -1,0 +1,11 @@
+Name: Priya Singh
+
+Skills:
+- Java, HTML, CSS
+- Manual Testing
+
+Projects:
+- Portfolio website
+
+Experience:
+- Fresher

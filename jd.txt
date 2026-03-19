@@ -1,0 +1,15 @@
+Role: AI Automation Intern
+
+Requirements:
+- Strong Python skills
+- Experience with APIs (REST, OpenAI)
+- Basic understanding of AI/ML
+- Familiarity with automation tools (Zapier, n8n)
+- Good problem-solving ability
+- Experience with databases (SQL or MongoDB)
+
+Responsibilities:
+- Build automation workflows using AI
+- Integrate APIs
+- Process and analyze data
+- Develop small AI-powered tools

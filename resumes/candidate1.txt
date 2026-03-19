@@ -1,0 +1,14 @@
+Name: Rahul Sharma
+
+Skills:
+- Python, SQL
+- Data Analysis
+- Basic Machine Learning
+- REST APIs
+
+Projects:
+- Built chatbot using OpenAI API
+- Data analysis dashboard using Python
+
+Experience:
+- Internship in data analytics
