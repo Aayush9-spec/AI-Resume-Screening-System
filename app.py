@@ -9,19 +9,36 @@ import json
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-def login():
-    st.sidebar.title("Login")
+def check_password():
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
 
-    username = st.sidebar.text_input("Username")
-    password = st.sidebar.text_input("Password", type="password")
-
-    if username == "admin" and password == "1234":
-        return True
-    else:
-        st.sidebar.warning("Enter valid credentials")
+    if not st.session_state.logged_in:
+        st.markdown("<h1 style='text-align: center;'>🔐 AI Recruiter Login</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;'>Please enter your credentials to access the ATS dashboard.</p>", unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.write("")
+            with st.container(border=True):
+                username = st.text_input("👤 Username")
+                password = st.text_input("🔑 Password", type="password")
+                
+                if st.button("Log In", use_container_width=True, type="primary"):
+                    if username == "admin" and password == "1234":
+                        st.session_state.logged_in = True
+                        st.rerun()
+                    else:
+                        st.error("Incorrect username or password")
         return False
+    else:
+        st.sidebar.title("⚙️ Dashboard Settings")
+        if st.sidebar.button("Logout", use_container_width=True):
+            st.session_state.logged_in = False
+            st.rerun()
+        return True
 
-if not login():
+if not check_password():
     st.stop()
 
 st.title("AI Resume Screening System")
