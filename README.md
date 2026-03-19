@@ -69,7 +69,7 @@ OPENAI_API_KEY=your_api_key
 
 ## Demo
 
-(Add your deployed app link here)
+(https://ai-resume-screening-sys.streamlit.app)
 
 ## Author
 
